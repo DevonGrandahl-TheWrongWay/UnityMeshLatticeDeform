@@ -1,5 +1,6 @@
 # Mesh Lattice Deform
-A quick and dirty example of lattice/cage mesh deformation in Unity3D.
+A quick and dirty example of lattice/cage mesh deformation in Unity3D. This algorithm is pretty simple and it's easily extendable to a full 3D Mesh Cage Deformer.
+
 ![Demo](https://i.imgur.com/4Kce4Zg.gif)
 
 TheWrongWay focuses on **minimal** examples that can (and probably should) be expanded and improved upon for your project.
@@ -14,6 +15,8 @@ Some basic Unity/coding experience. The intention is not to detail every click y
 Lattice Definition: take four handles that define a quad and create NxN evenly-spaced nodes inside that quad. When the handles move, the location of these nodes should update to stay evenly distributed. Each node must track it's own current position and starting position. This can expanded to a 3D to create a "Cage" of nodes.
 
 When a mesh is placed within the lattice, each vertex of the mesh should find the closest point on the lattice and move along with it. i.e., if the closest point on the lattice moves 2 units up, the vertex should also move 2 units up relative to its own position.
+
+
 
 ## Getting Started
 
@@ -48,6 +51,7 @@ public class LatticePoint {
 }
 
 public class MeshDeformer : MonoBehaviour {
+// 0-1 must be parallel to 2-3. i.e., assign the points in a circle, not across.
 	public Transform[] handles;
 	private List<LatticePoint> lattice = new List<LatticePoint>();
 
@@ -56,7 +60,7 @@ public class MeshDeformer : MonoBehaviour {
 [...]
 ```
 
-For each division D, use lerp to find the spot on the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp along the the START to END line and add those points to the LatticePoint array.
+For each division D, use lerp to find the spot on the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between the START and END points and add those points to the LatticePoint array.
 
 ```
 [...]
@@ -93,7 +97,7 @@ public void OnDrawGizmos() {
 
 ![Lattice](https://i.imgur.com/OvHs9zO.gif)
 
-The last step of the lattice is to update the nodes every frame to keep up with our handles. This looks a lot like the BuildLattice function, so it really *should* be generalized. Here at TheWrongWay we *strongly* prefer readability over decent coding practices.
+The last step of the lattice is to update the nodes every frame to keep up with our handles. This looks a lot like the BuildLattice function, so it really *should* be generalized, but here at TheWrongWay we *strongly* prefer readability over decent coding practices.
 
 ```
 public void Update() {
@@ -182,8 +186,9 @@ Press play and move the handles around, with any luck the model should now defor
 
 ![Demo](https://i.imgur.com/4Kce4Zg.gif)
 
-## Conclusion/Improvements
-This should probably be broken apart into multiple classes and files (Lattice, Deformer, LatticePoint). Also, the structure of the Handles array is **super** janky (edge 0-1 must be parallel to edge 2-3). 
+I only needed a 2D lattice, but keep in mind that this could pretty easily be applied to make a full 3D Cage Deformer. You'd just have to add 4 more handles and generate/update more LatticePoints between all of them. I don't think the Deform() method would have to change at all!
 
-I only needed a 2D lattice, but this could pretty easily be applied to a real 3D deform cage. You'd just have to add 4 more handles and generate/update more LatticePoints between all of them. The deform method would work the same.
-
+## The Right Way
+* *Coding Practices* This should really be broken apart into multiple classes and files (Lattice, Deformer, LatticePoint). 
+* *Coding Practices* The structure of the Handles array is **super** janky (edge 0-1 must be parallel to edge 2-3). Do something better than that.
+* *Performance* This whole thing could (and should) be sped up a bit by storing the closest LatticePoint for every vertex, since it should be the same every frame. Maybe just a LatticePoint array with an entry for every vertex?
