@@ -62,7 +62,7 @@ public class MeshDeformer : MonoBehaviour {
 
 For each division D, lerp along the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between those START and END points and add the lerped points to the LatticePoint array.
 
-Notice the InverseTransformPoint calls. Since Vertices are in local space, everything gets easier if we convert all LatticePoints from worldspace to localspace.
+[Diagram](https://i.imgur.com/yGXAu3C.gif)
 
 ```
 [...]
@@ -77,6 +77,8 @@ public void BuildLattice() {
   for (int i = 0; i < latticeDivisions + 2; i++) {
     Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
     Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
+    
+    // Use InverseTransformPoint to covner from worldspace to localspace to make Vertex stuff easier.
     lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionStart)));
     lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionEnd)));
 
