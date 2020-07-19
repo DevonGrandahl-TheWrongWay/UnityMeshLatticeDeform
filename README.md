@@ -62,6 +62,8 @@ public class MeshDeformer : MonoBehaviour {
 
 For each division D, lerp along the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between those START and END points and add the lerped points to the LatticePoint array.
 
+Notice the InverseTransformPoint calls. Since Vertices are in local space, everything gets easier if we convert all LatticePoints from worldspace to localspace.
+
 ```
 [...]
 public void Start() {
@@ -70,17 +72,17 @@ public void Start() {
   
 // Lerp across two parallel lines, adding a point at the start, end, and every lerped point in between.
 public void BuildLattice() {
-	lattice.Clear();
+  lattice.Clear();
 
-	for (int i = 0; i < latticeDivisions + 2; i++) {
-		Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
-		Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
-		lattice.Add(new LatticePoint(divisionStart));
-		lattice.Add(new LatticePoint(divisionEnd));
+  for (int i = 0; i < latticeDivisions + 2; i++) {
+    Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
+    Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
+    lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionStart)));
+    lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionEnd)));
 
-		for (int j = 1; j < latticeDivisions; j++) {
-			lattice.Add(new LatticePoint(Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f))));
-		}
+    for (int j = 1; j < latticeDivisions; j++) {
+      lattice.Add(new LatticePoint(transform.InverseTransformPoint(Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f)))));
+    }
   }
 }
 ```
@@ -88,10 +90,12 @@ public void BuildLattice() {
 Now we have our list of LatticePoints, evenly spaced inside our handles. Let's add some gizmos and press Play so we can see our work.
 ```
 public void OnDrawGizmos() {
-	foreach (LatticePoint t in lattice) {
-		Gizmos.color = Color.cyan;
-		Gizmos.DrawSphere(t.position, .03f);
-	}
+  foreach (LatticePoint t in lattice) {
+    Gizmos.color = Color.cyan;
+    
+    // Draw a sphere using TransformPoint to go from localspace to worldspace
+    Gizmos.DrawSphere(transform.TransformPoint(t.position), .03f);
+  }
 }
 ```
 
@@ -107,18 +111,18 @@ public void Update() {
 [...]
 
 public void UpdateLattice() {
-		for (int i = 0; i < latticeDivisions + 2; i++) {
-			int rowStart = i * (latticeDivisions + 1);
-			Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
-			Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
-			lattice[rowStart].position = divisionStart;
-			lattice[rowStart + 1].position = divisionEnd;
+  for (int i = 0; i < latticeDivisions + 2; i++) {
+    int rowStart = i * (latticeDivisions + 1);
+    Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
+    Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
+    lattice[rowStart].position = transform.InverseTransformPoint(divisionStart);
+    lattice[rowStart + 1].position = transform.InverseTransformPoint(divisionEnd);
 
-			for (int j = 1; j < latticeDivisions; j++) {
-				lattice[rowStart + 1 + j].position = Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f));
-			}
-		}
-	}
+    for (int j = 1; j < latticeDivisions; j++) {
+      lattice[rowStart + 1 + j].position = transform.InverseTransformPoint(Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f)));
+    }
+  }
+}
 ```
 
 ### Deforming the Mesh
