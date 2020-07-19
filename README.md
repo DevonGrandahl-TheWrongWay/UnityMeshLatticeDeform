@@ -6,7 +6,7 @@ A quick and dirty example of lattice/cage mesh deformation in Unity3D. This algo
 TheWrongWay focuses on **minimal** examples that can (and probably should) be expanded and improved upon for your project.
 
 ## Motivation
-While trying to recreate Oskar Stålberg's [Townscaper](https://store.steampowered.com/app/1291340/Townscaper/) I needed a way to do 2D 'cage' mesh deformation, but couldn't find any info on how the algorithm works. I had to start from scratch and failed a couple times, so I thought I'd save you some trouble.
+While trying to recreate Oskar Stålberg's beautiful [Townscaper](https://store.steampowered.com/app/1291340/Townscaper/) I needed a way to do 2D 'cage' mesh deformation, but couldn't find any info on how the algorithm works. I had to start from scratch and failed a couple times, so I thought I'd save you some trouble.
 
 ## Prerequisites
 Some basic Unity/coding experience. The intention is not to detail every click you need to make, but the general outline of the code and algorithm.
@@ -78,7 +78,7 @@ public void BuildLattice() {
     Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
     Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
     
-    // Use InverseTransformPoint to covner from worldspace to localspace to make Vertex stuff easier.
+    // Use InverseTransformPoint to convert from worldspace to localspace to make Vertex stuff easier.
     lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionStart)));
     lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionEnd)));
 
