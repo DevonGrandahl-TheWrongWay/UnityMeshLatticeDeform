@@ -60,9 +60,9 @@ public class MeshDeformer : MonoBehaviour {
 [...]
 ```
 
-For each division D, lerp along the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between those START and END points and add the lerped points to the LatticePoint array.
+Now the trickiest part. For each division D, lerp along the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between those START and END points and add the lerped points to the LatticePoint array. [Diagram](https://i.imgur.com/yGXAu3C.gif)
 
-[Diagram](https://i.imgur.com/yGXAu3C.gif)
+
 
 ```
 [...]
