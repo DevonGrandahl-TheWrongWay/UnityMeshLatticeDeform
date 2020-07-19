@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -44,7 +44,7 @@ public class MeshDeformer : MonoBehaviour {
 	public void OnDrawGizmos() {
 		foreach (LatticePoint t in lattice) {
 			Gizmos.color = Color.cyan;
-			Gizmos.DrawSphere(t.position, .03f);
+			Gizmos.DrawSphere(transform.TransformPoint(t.position), .03f);
 		}
 	}
 
@@ -55,11 +55,11 @@ public class MeshDeformer : MonoBehaviour {
 		for (int i = 0; i < latticeDivisions + 2; i++) {
 			Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
 			Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
-			lattice.Add(new LatticePoint(divisionStart));
-			lattice.Add(new LatticePoint(divisionEnd));
+			lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionStart)));
+			lattice.Add(new LatticePoint(transform.InverseTransformPoint(divisionEnd)));
 
 			for (int j = 1; j < latticeDivisions; j++) {
-				lattice.Add(new LatticePoint(Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f))));
+				lattice.Add(new LatticePoint(transform.InverseTransformPoint(Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f)))));
 			}
 		}
 	}
@@ -69,11 +69,11 @@ public class MeshDeformer : MonoBehaviour {
 			int rowStart = i * (latticeDivisions + 1);
 			Vector3 divisionStart = Vector3.Lerp(handles[0].position, handles[1].position, i / (latticeDivisions * 1f));
 			Vector3 divisionEnd = Vector3.Lerp(handles[3].position, handles[2].position, i / (latticeDivisions * 1f));
-			lattice[rowStart].position = divisionStart;
-			lattice[rowStart + 1].position = divisionEnd;
+			lattice[rowStart].position = transform.InverseTransformPoint(divisionStart);
+			lattice[rowStart + 1].position = transform.InverseTransformPoint(divisionEnd);
 
 			for (int j = 1; j < latticeDivisions; j++) {
-				lattice[rowStart + 1 + j].position = Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f));
+				lattice[rowStart + 1 + j].position = transform.InverseTransformPoint(Vector3.Lerp(divisionStart, divisionEnd, j / (latticeDivisions * 1f)));
 			}
 		}
 	}
@@ -92,8 +92,7 @@ public class MeshDeformer : MonoBehaviour {
 		List<Vector3> deformedVertices = new List<Vector3>();
 
 		// For every vertex in the original mesh...
-		foreach (Vector3 vertex in vertices) { 
-
+		foreach (Vector3 vertex in vertices) {
 
 			// Find the closest point in the original lattice
 			float lowestDistanceToLattice = Mathf.Infinity;
@@ -108,7 +107,7 @@ public class MeshDeformer : MonoBehaviour {
 
 			// Once found, any offset applied to that lattice should affect this vertex
 			deformedVertices.Add(vertex + latticeOffset);
-			
+
 		}
 
 
