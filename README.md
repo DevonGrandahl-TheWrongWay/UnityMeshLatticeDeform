@@ -60,7 +60,7 @@ public class MeshDeformer : MonoBehaviour {
 [...]
 ```
 
-For each division D, use lerp to find the spot on the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between the START and END points and add those points to the LatticePoint array.
+For each division D, lerp along the 0-1 line, and find the corresponding spot on the parallel 3-2 line. These are our START and END points on opposite sides of the quad. Add them to our LatticePoints list. Lastly, for each division D2, lerp between those START and END points and add the lerped points to the LatticePoint array.
 
 ```
 [...]
@@ -122,7 +122,7 @@ public void UpdateLattice() {
 ```
 
 ### Deforming the Mesh
-Based on [CatLikeCoding's Mesh Deform writeup](https://catlikecoding.com/unity/tutorials/mesh-deformation/), lets set up some variables. We'll need a reference to the MeshFilter and lets create a private variable to store our Mesh.
+Based on [CatLikeCoding's](https://catlikecoding.com/unity/tutorials/mesh-deformation/) and [Ray Wenderlich's](https://www.raywenderlich.com/3169311-runtime-mesh-manipulation-with-unity) write-ups, lets set up some variables. We'll need a reference to the MeshFilter and lets create a private variable to store our Mesh.
 
 ```
 [...]
@@ -186,9 +186,12 @@ Press play and move the handles around, with any luck the model should now defor
 
 ![Demo](https://i.imgur.com/4Kce4Zg.gif)
 
-I only needed a 2D lattice, but keep in mind that this could pretty easily be applied to make a full 3D Cage Deformer. You'd just have to add 4 more handles and generate/update more LatticePoints between all of them. I don't think the Deform() method would have to change at all!
+I only needed a 2D lattice, but keep in mind that this code could easily be applied to make a full 3D Cage Deformer. You'd just have to add 4 more handles and generate/update LatticePoints between all of them. I don't even think the Deform() method would have to change.
 
 ## The Right Way
 * *Coding Practices* This should really be broken apart into multiple classes and files (Lattice, Deformer, LatticePoint). 
 * *Coding Practices* The structure of the Handles array is **super** janky (edge 0-1 must be parallel to edge 2-3). Do something better than that.
-* *Performance* This whole thing could (and should) be sped up a bit by storing the closest LatticePoint for every vertex, since it should be the same every frame. Maybe just a LatticePoint array with an entry for every vertex?
+* *Coding Practices/Reuse* Generalize BuildLattice() and UpdateLattice() to use the same code since they are so similar.
+* *Performance* This whole thing could (and should) be sped up a bit by storing the closest LatticePoint for every vertex, since it should be the same every frame. A LatticePoint array with an entry for every vertex should be fine.
+
+Thanks for following along, I hope you found this guide helpful. Also, thanks to [CatLikeCoding](https://catlikecoding.com/unity/tutorials/mesh-deformation/) and [Ray Wenderlich](https://www.raywenderlich.com/3169311-runtime-mesh-manipulation-with-unity) for their great tutorials on general mesh deformation.
